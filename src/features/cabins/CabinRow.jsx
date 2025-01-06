@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { deleteCabin } from "../../services/apiCabins";
 import { formatCurrency } from "../../utils/helpers";
 import toast from "react-hot-toast";
+import { useState } from "react";
+import CreateCabinForm from "./CreateCabinForm";
 
 const TableRow = styled.div`
   display: grid;
@@ -46,6 +48,11 @@ const Discount = styled.div`
 
 export default function CabinRow({ cabin }) {
   const { id: cabinId, name, maxCapacity, image, regularPrice, discount } = cabin;
+  const [showForm, setShowForm] = useState(false);
+
+  function toggleForm() {
+    setShowForm((show) => !show);
+  }
 
   const queryClient = useQueryClient();
 
@@ -61,15 +68,21 @@ export default function CabinRow({ cabin }) {
   });
 
   return (
-    <TableRow>
-      <Img src={image} />
-      <Cabin>{name}</Cabin>
-      <div>Fits up to {maxCapacity} people</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
-        Delete
-      </button>
-    </TableRow>
+    <>
+      <TableRow>
+        <Img src={image} />
+        <Cabin>{name}</Cabin>
+        <div>Fits up to {maxCapacity} people</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{formatCurrency(discount)}</Discount>
+        <div>
+          <button onClick={toggleForm}>Edit</button>
+          <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+            Delete
+          </button>
+        </div>
+      </TableRow>
+      {showForm && <CreateCabinForm cabinToEdit={cabin} />}
+    </>
   );
 }
